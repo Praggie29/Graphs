@@ -10,7 +10,7 @@ public:
         if((n%2==1 && row%2==1)||(n%2==0 && row%2==0))
             col = n-1-col;
         
-        return make_pair(row, col);
+        return {row, col};
     }
     
     int snakesAndLadders(vector<vector<int>>& board) {
