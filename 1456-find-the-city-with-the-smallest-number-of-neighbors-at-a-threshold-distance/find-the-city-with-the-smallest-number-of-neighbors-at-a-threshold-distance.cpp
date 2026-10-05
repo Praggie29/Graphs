@@ -1,67 +1,56 @@
 class Solution {
 public:
-    #define P pair<int, int>
-    void dijkstra(int n, unordered_map<int, vector<P>>& adj, vector<int>& result, int S) {
-        queue<P> pq;
-        pq.push({0, S});
-        fill(result.begin(), result.end(), INT_MAX);
-        result[S] = 0;  
-        while (!pq.empty()) {
-            int d = pq.front().first;
-            int node = pq.front().second;
-            pq.pop();
+    int getReachableCount(int S, int n, unordered_map<int, vector<pair<int, int>>>& adj, int distanceThreshold) {
+        queue<pair<int, int>> q; 
+        vector<int> dist(n, INT_MAX);              
 
-            for (auto& p : adj[node]) {
-                int adjNode = p.first;
-                int dist = p.second;
+        dist[S] = 0;
+        q.push({0, S});
 
-                if (d + dist < result[adjNode]) {
-                    result[adjNode] = d + dist;
-                    pq.push({d + dist, adjNode});
+        while (!q.empty()) {
+            int d = q.front().first;
+            int node = q.front().second;
+            q.pop();
+
+            if (d > dist[node]) continue;
+
+            for (auto& neighbor : adj[node]) {
+                int adjNode = neighbor.first;
+                int weight = neighbor.second;
+
+                if (d + weight < dist[adjNode]) {
+                    dist[adjNode] = d + weight;
+                    q.push({dist[adjNode], adjNode});
                 }
             }
         }
-    }
-
-    int getCityWithFewestReachable(int n, const vector<vector<int>>& shortestPathMatrix, int distanceThreshold) {
-        int cityWithFewestReachable = -1;
-        int fewestReachableCount = INT_MAX;
-        for (int i = 0; i < n; i++) {
-            int reachableCount = 0;
-            for (int j = 0; j < n; j++) {
-                if (i != j && shortestPathMatrix[i][j] <= distanceThreshold) {
-                    reachableCount++;
-                }
-            }
-
-            if (reachableCount <= fewestReachableCount) {
-                fewestReachableCount = reachableCount;
-                cityWithFewestReachable = i;
+        int count = 0;
+        for (int i = 0; i < n; ++i) {
+            if (i != S && dist[i] <= distanceThreshold) {
+                count++;
             }
         }
-        return cityWithFewestReachable;
+
+        return count;
     }
 
     int findTheCity(int n, vector<vector<int>>& edges, int distanceThreshold) {
-        unordered_map<int, vector<P>> adj;
-
-        vector<vector<int>> shortestPathMatrix(n, vector<int>(n, INT_MAX));
-
-        for (int i = 0; i < n; i++) {
-            shortestPathMatrix[i][i] = 0;  
-        }
-
+        unordered_map<int, vector<pair<int, int>>> adj;
         for (const auto& edge : edges) {
-            int start = edge[0];
-            int end = edge[1];
-            int weight = edge[2];
-            adj[start].push_back({end, weight});
-            adj[end].push_back({start, weight});
-        }
-        for (int i = 0; i < n; i++) {
-            dijkstra(n, adj, shortestPathMatrix[i], i);
+            adj[edge[0]].push_back({edge[1], edge[2]});
+            adj[edge[1]].push_back({edge[0], edge[2]});
         }
 
-        return getCityWithFewestReachable(n, shortestPathMatrix, distanceThreshold);
+        int cityWithFewestReachable = -1;
+        int minReachableCount = INT_MAX;
+        for (int i = 0; i < n; ++i) {
+            int reachableCount = getReachableCount(i, n, adj, distanceThreshold);
+            if (reachableCount <= minReachableCount) {
+                minReachableCount = reachableCount;
+                cityWithFewestReachable = i;
+            }
+        }
+
+        return cityWithFewestReachable;
     }
 };
