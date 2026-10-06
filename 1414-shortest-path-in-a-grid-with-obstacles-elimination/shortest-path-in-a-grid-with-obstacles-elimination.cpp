@@ -32,8 +32,8 @@ public:
                     int nc = col + dc[d];
 
                     if (nr >= 0 && nr < n && nc >= 0 && nc < m) {
-                        int nextK = kVal - grid[nr][nc];
-
+                        int nextK = kVal;
+                        if ( grid[nr][nc] == 1 ) nextK--;
                         if (nextK >= 0 && nextK > visited[nr][nc]) {
                             visited[nr][nc] = nextK;
                             q.push({nr, nc, nextK}); 
