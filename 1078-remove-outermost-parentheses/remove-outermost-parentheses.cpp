@@ -2,9 +2,9 @@ class Solution {
 public:
     string removeOuterParentheses(string s) {
         string ans = "";
-        int cnt = 0;
+        int cnt = 1;
         int n = s.size();
-        for ( int i = 0 ; i < n ; i ++ ) {
+        for ( int i = 1 ; i < n ; i ++ ) {
             if ( s[i] == '(' ) {
                 cnt++;
                 if ( cnt == 1 ) continue;
